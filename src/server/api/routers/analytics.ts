@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { eq, sql, and, gte, lte, desc, count, sum } from "drizzle-orm";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import {
   users,
   messageLogs,
@@ -21,7 +21,7 @@ const getDateRange = (period: "7d" | "30d" | "90d" | "1y") => {
 
 export const analyticsRouter = createTRPCRouter({
   // USER ANALYTICS
-  userGrowth: protectedProcedure
+  userGrowth: publicProcedure
     .input(z.object({ period: z.enum(["7d", "30d", "90d", "1y"]) }))
     .query(async ({ ctx, input }) => {
       // Since users table doesn't have createdAt, we'll use accounts table as a proxy for user registration
@@ -55,7 +55,7 @@ export const analyticsRouter = createTRPCRouter({
       };
     }),
 
-  userRetention: protectedProcedure
+  userRetention: publicProcedure
     .input(z.object({ period: z.enum(["7d", "30d", "90d"]) }))
     .query(async ({ ctx }) => {
       // Since we don't have user createdAt, we'll provide simulated retention data
@@ -87,7 +87,7 @@ export const analyticsRouter = createTRPCRouter({
       return retentionData;
     }),
 
-  userEngagement: protectedProcedure
+  userEngagement: publicProcedure
     .input(z.object({ period: z.enum(["7d", "30d", "90d"]) }))
     .query(async ({ ctx, input }) => {
       const { startDate, endDate } = getDateRange(input.period);
@@ -139,7 +139,7 @@ export const analyticsRouter = createTRPCRouter({
       };
     }),
 
-  authenticationPatterns: protectedProcedure
+  authenticationPatterns: publicProcedure
     .query(async ({ ctx }) => {
       const providerStats = await ctx.db
         .select({
@@ -164,7 +164,7 @@ export const analyticsRouter = createTRPCRouter({
     }),
 
   // USAGE & BEHAVIOR ANALYTICS
-  messageVolume: protectedProcedure
+  messageVolume: publicProcedure
     .input(z.object({ period: z.enum(["7d", "30d", "90d"]) }))
     .query(async ({ ctx, input }) => {
       const { startDate, endDate } = getDateRange(input.period);
@@ -209,7 +209,7 @@ export const analyticsRouter = createTRPCRouter({
       };
     }),
 
-  userSegmentation: protectedProcedure
+  userSegmentation: publicProcedure
     .query(async ({ ctx }) => {
       // Free vs paid users
       const userSegments = await ctx.db
@@ -249,7 +249,7 @@ export const analyticsRouter = createTRPCRouter({
     }),
 
   // REVENUE ANALYTICS
-  conversionFunnel: protectedProcedure
+  conversionFunnel: publicProcedure
     .input(z.object({ period: z.enum(["30d", "90d", "1y"]) }))
     .query(async ({ ctx, input }) => {
       const { startDate, endDate } = getDateRange(input.period);
@@ -320,7 +320,7 @@ export const analyticsRouter = createTRPCRouter({
       };
     }),
 
-  revenueMetrics: protectedProcedure
+  revenueMetrics: publicProcedure
     .input(z.object({ period: z.enum(["30d", "90d", "1y"]) }))
     .query(async ({ ctx, input }) => {
       const { startDate, endDate } = getDateRange(input.period);
@@ -372,7 +372,7 @@ export const analyticsRouter = createTRPCRouter({
       };
     }),
 
-  paymentAnalysis: protectedProcedure
+  paymentAnalysis: publicProcedure
     .input(z.object({ period: z.enum(["30d", "90d", "1y"]) }))
     .query(async ({ ctx, input }) => {
       const { startDate, endDate } = getDateRange(input.period);
@@ -425,7 +425,7 @@ export const analyticsRouter = createTRPCRouter({
     }),
 
   // OPERATIONAL ANALYTICS
-  systemHealth: protectedProcedure
+  systemHealth: publicProcedure
     .input(z.object({ period: z.enum(["7d", "30d", "90d"]) }))
     .query(async ({ ctx, input }) => {
       const { startDate, endDate } = getDateRange(input.period);
@@ -478,7 +478,7 @@ export const analyticsRouter = createTRPCRouter({
       };
     }),
 
-  rateLimitingImpact: protectedProcedure
+  rateLimitingImpact: publicProcedure
     .input(z.object({ period: z.enum(["7d", "30d", "90d"]) }))
     .query(async ({ ctx, input }) => {
       const { startDate, endDate } = getDateRange(input.period);
